@@ -1,0 +1,206 @@
+﻿
+@addTagHelper*, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+
+
+@{
+    Layout = null;
+}
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+</div>
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+    <style>
+        .jstree li.jstree-open > a.jstree-anchor > i.jstree-checkbox,
+        .jstree li.jstree-closed > a.jstree-anchor > i.jstree-checkbox {
+            display: none;
+        }
+    </style>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+</head>
+<body>
+    <div id="jstree">
+    </div>
+    <form method="post" asp-controller="Home" asp-action="Index">
+        <input type="hidden" name="selectedItems" id="selectedItems" />
+        <input type="submit" value="Edit Node" class="btn btn-primary" />
+    </form>
+    <form method="post" asp-controller="Home" asp-action="DeleteNode">
+        <input type="hidden" name="selectedData" id="selectedData" />
+        <input type="submit" value="Delete Node" class="btn btn-danger" />
+    </form>
+
+
+    <h3 style="color:green;">Add or Edit  Node</h3>
+    <form method="post" asp-controller="Home" asp-action="CreateNode">
+        <label for="NodeName">Node Name:</label>
+        <input type="hidden" name="nodeid" id="nodeid" />
+        <input type="text" id="NodeName" name="NodeName" required placeholder="Enter Node Name" />
+        <br />
+        <label for="isactive">Is Active:</label>
+        <select id="isactive" name="IsActive">
+            <option value="1">Yes</option>
+            <option value="0">No</option>
+        </select>
+        <br />
+        <label for="parentnodeid">Parent Node ID:</label>
+        <select id="parentnodeid" name="parentnodeid">
+            <option name="parentnodeid" value="">Select Parent Node ID (Optional)</option>
+        </select>
+        <br />
+        <input type="submit" value="Submit" />
+    </form>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/themes/default/style.min.css" />
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.1/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/jstree.min.js"></script>
+
+    <script type="text/javascript">
+        //This us used to select all tree structure from root to end child
+        //$(function () {
+        //    $('#jstree').on('changed.jstree', function (e, data) {
+        //        var i, j;
+        //        var selectedItems = [];
+        //        alert(data.selected[0]);
+        //        //this._specTree.jstree("deselect_all");
+        //        if(data.selected.length && data.node.id!==selectedNodeId)
+        //            instance.deselect_all();
+        //        //for (i = 0, j = data.selected.length; i < j; i++) {
+        //        //    //Fetch the Id.
+        //        //    var id = data.selected[i];
+        //        //    alert(id);
+        //        //    //Remove the ParentId.
+        //        //    if (id.indexOf('-') != -1) {
+        //        //        id = id.split("-")[1];
+        //        //    }
+
+        //        //    //Add the Node to the JSON Array.
+        //        //    var node = data.instance.get_node(data.selected[i]);
+        //        //    if (node) {
+        //        //        selectedItems.push({
+        //        //            text: data.instance.get_node(data.selected[i]).text,
+        //        //            id: id,
+        //        //            parent: data.node && data.node.parents && data.node.parents.length > 0 ? data.node.parents[0] : null
+        //        //        });
+        //        //    } else {
+        //        //        console.error('Node not found for id:', data.selected[i]);
+        //        //    }
+        //        //}
+
+        //        //Serialize the JSON Array and save in HiddenField.
+        //        $('#selectedItems').val(JSON.stringify(selectedItems));
+        //    }).jstree({
+        //        "core": {
+        //            "themes": {
+        //                "variant": "large"
+        //            },
+        //            // Use the JSON data directly without HTML encoding
+        //            "data": @Html.Raw(ViewBag.Json)
+        //            },
+        //        "checkbox": {
+        //            "keep_selected_style": false
+        //        },
+        //        "plugins": ["wholerow", "checkbox"],
+        //    });
+        //});
+        var jsonObject = null;
+        $(function () {
+            let Tree = $("#jstree").jstree({
+                'core': {
+                    'themes': {
+                        'variant': 'large'
+                    },
+                    'data': @Html.Raw(ViewBag.Json)
+                                        },
+                'checkbox': {
+                    'whole_node': false,
+                    'tie_selection': false,
+                    'keep_selected_style': false,
+                    //'cascade': 'down'
+                },
+                'plugins': ["checkbox"]
+            });
+            Tree.on("check_node.jstree", function (e, data) {
+                var selectedNodes = $("#jstree").jstree().get_checked();
+                console.log(selectedNodes);
+
+                console.log(data.node);
+                console.log(data.node.text);
+                console.log(data.node.parent);
+                $('#nodeid').val(data.node.id);
+                if (data.node.text) {
+                    $('#NodeName').val(data.node.text);
+                } else {
+                    $('#NodeName').val('');
+                }
+                $('#parentnodeid').empty();
+                console.log("Global Data", jsonObject);
+                $.each(jsonObject, function (index, item) {
+                    debugger;
+                    console.log("For each loop " + data.node.parent + " Node id " + item.NodeId);
+                    if (data.node.parent == item.NodeId) {
+                        $('#parentnodeid').append($('<option>', {
+                            value: item.NodeId,
+                            text: item.NodeName 
+                        }));
+                    }  
+                    if (data.node.parent == "#") {
+                         $('#parentnodeid').append($('<option>', {
+                            value: "0",
+                            text: "This is Parent Node" 
+                        }));
+                    }
+                });
+                $('#selectedData').val(data.node.id);
+                if (selectedNodes.length > 1) {
+                    $("#jstree").jstree().uncheck_node(selectedNodes[0]);
+                }
+            });
+        });
+        // Bind dropdown All Node
+        $.ajax({
+            url: 'https://localhost:44320/Home/BindAllNode', 
+            method: 'GET', 
+            dataType: 'json', 
+            success: function (data) {
+                console.log("Data Return", data);
+                 jsonObject = JSON.parse(data);
+
+                $.each(jsonObject, function (index, item) {
+                    $('#parentnodeid').append($('<option>', {
+                        value: item.NodeId,
+                        text: item.NodeName
+                    }));
+                });
+            },
+            error: function (xhr, status, error) {
+                console.error('Error fetching data:', error);
+            }
+        });
+    </script>
+
+</body>
+</html>
+
+
+
+
+
+
